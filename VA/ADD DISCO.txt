@@ -1,0 +1,82 @@
+ADD disco
+
+#WINDOWS
+Para definir o tamanho do disco no Vagrant/VirtualBox 😊:
+
+Opção 1: Disco primário (C:)
+
+vb.customize ["modifyvm", :id, "--hda", "50GB"]
+
+
+Opção 2: Adicionar discos adicionais (D:, E:)
+
+vb.customize ['createhd', '--filename', 'disk-D.vdi', '--size', 20 * 1024]
+vb.customize ['storageattach', :id, '--storagectl', 'SATA', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', 'disk-D.vdi']
+
+vb.customize ['createhd', '--filename', 'disk-E.vdi', '--size', 30 * 1024]
+vb.customize ['storageattach', :id, '--storagectl', 'SATA', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', 'disk-E.vdi']
+
+
+Exemplo completo:
+
+vm.vm.provider("virtualbox") do |vb|
+  vb.name = app_config[:name]
+  vb.memory = 2048
+  vb.cpus = 2
+  
+  # Disco C: (50GB)
+  vb.customize ["modifyvm", :id, "--hda", "50GB"]
+  
+  # Disco D: (20GB)
+  vb.customize ['createhd', '--filename', 'disk-D.vdi', '--size', 20 * 1024]
+  vb.customize ['storageattach', :id, '--storagectl', 'SATA', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', 'disk-D.vdi']
+  
+  # Disco E: (30GB)
+  vb.customize ['createhd', '--filename', 'disk-E.vdi', '--size', 30 * 1024]
+  vb.customize ['storageattach', :id, '--storagectl', 'SATA', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', 'disk-E.vdi']
+end
+
+
+Atenção: os discos D e E vão aparecer como novos no SO (precisa formatar/criar partição) 👍.
+
+
+#LINUX
+Se for Linux 😊:
+
+- Discos adicionais (D:, E:) → são /dev/sdb, /dev/sdc, etc.
+- No Linux não tem "C:", "D:", etc. → são pontos de montagem (/mnt/disk-d, /mnt/disk-e, etc).
+
+Mesmo esquema:
+
+# Disco adicional 1 (/dev/sdb)
+vb.customize ['createhd', '--filename', 'disk-d.vdi', '--size', 20 * 1024]
+vb.customize ['storageattach', :id, '--storagectl', 'SATA', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', 'disk-d.vdi']
+
+# Disco adicional 2 (/dev/sdc)
+vb.customize ['createhd', '--filename', 'disk-e.vdi', '--size', 30 * 1024]
+vb.customize ['storageattach', :id, '--storagectl', 'SATA', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', 'disk-e.vdi']
+
+
+Dentro do Linux:
+- lsblk mostra os discos.
+- Precisa formatar e montar:
+
+bash
+sudo mkfs.ext4 /dev/sdb
+sudo mkdir /mnt/disk-d
+sudo mount /dev/sdb /mnt/disk-d
+
+sudo mkfs.ext4 /dev/sdc
+sudo mkdir /mnt/disk-e
+sudo mount /dev/sdc /mnt/disk-e
+
+
+Dúvida: quer automatizar isso no Vagrant (provision)? 😊
+ # Provision Linux
+      vm.vm.provision "shell", inline: <<-SHELL
+        sudo mkfs.ext4 /dev/sdb
+        sudo mkdir -p /mnt/disk-d
+        sudo mount /dev/sdb /mnt/disk-d
+        sudo mkfs.ext4 /dev/sdc
+        sudo mkdir -p /mnt/disk-e
+        sudo mount /dev/sdc /mnt/disk-e

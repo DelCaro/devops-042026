@@ -1,0 +1,7 @@
+---
+# handlers file for roles/bd
+    - name: RestartMysql
+      service:
+        name: mysql
+        state: restarted
+        enabled: yes

@@ -1,0 +1,30 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+ Vagrant.configure("2") do |config|
+  config.vm.box = "StefanScherer/windows_2019" # Example box
+  #config.vm.provider :hyperv
+  #config.vm.provider :virtualbox
+  #config.vm.provider :hyperv
+
+  # Define VirtualBox provider settings
+  #config.vm.provider virtualbox" do |vb|
+
+    # Define ESXI-Vcenter provider settings
+  #config.vm.provider :vsphere do |vs|
+
+  # Define Hyperv provider settings
+  config.vm.provider :hyperv do |hv|
+    hv.vmname = "DNS01"
+    hv.memory = "2048" 
+    hv.cpus = 2 # <- Número de CPUs
+    # hv.enable_virtualization_extensions = true
+ #config.vm.network "public_network"
+   config.winrm.username = "vagrant"
+   config.winrm.password = "vagrant"
+
+ #Discos:
+#hv.customize ["vm", "add", :id, "--controller", "0", "--port", "0", "--disk", "disk1.vhdx", "--size", "40GB"]
+#hv.customize ["vm", "add", :id, "--controller", "0", "--port", "1", "--disk", "disk2.vhdx", "--size", "80GB"]
+  end
+end
