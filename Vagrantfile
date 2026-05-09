@@ -12,14 +12,19 @@ config.vm.define "controle" do |controle|
     controle.vm.box = "shekeriev/debian-12"
     controle.vm.network "private_network", ip: "172.17.177.100"
     controle.vm.hostname = "controle"
+	config.ssh.insert_key = true
     controle.vm.provision "ansible_local" do |al|
       al.playbook = "installdocker.yml"
       al.install_mode = "apt"
     end
-
+    controle.vm.provision "ansible_local" do |al|
+      al.playbook = "installjenkins.yml"
+      al.install_mode = "apt"
+    end
+	
     controle.vm.provider "virtualbox" do |vb|
       vb.name = "controle"
-      vb.memory = "2048"
+      vb.memory = "6000"
       vb.cpus = 2
     end
   end
