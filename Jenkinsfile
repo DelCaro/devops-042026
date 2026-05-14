@@ -82,8 +82,12 @@ pipeline {
             }
         }
     }
-
     post {
         success {
             slackSend channel: '#ci-devops', message: "Pipeline finalizado com sucesso! Build #${BUILD_NUMBER}", tokenCredentialId: 'slack-token'
-        atdcaro/web:latest }
+        }   
+        failure {
+            slackSend channel: '#ci-devops', message: "Pipeline falhou! Verifique o console. Build #${BUILD_NUMBER}", tokenCredentialId: 'slack-token'
+        }   
+    }   
+}    
