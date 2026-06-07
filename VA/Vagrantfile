@@ -20,6 +20,7 @@ vm.vm.provider("virtualbox") do |vb|
 	vb.name = app_config[:name]
 	vb.memory = 2048
 	vb.cpus = 2
+	#vb.autostart = false
 	
 
 end
